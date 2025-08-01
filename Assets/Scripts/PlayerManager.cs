@@ -32,6 +32,9 @@ public class PlayerManager : MonoBehaviour
     private bool isGrounded;
     private float horizontalInput;
 
+    // Variable pública per al punt de spawn (assignar des de l'Inspector)
+    public Transform spawnPoint;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -224,12 +227,12 @@ public class PlayerManager : MonoBehaviour
             StartCoroutine(ExplodeCopies());
         }
     }
-    
+
     // Coroutine per gestionar l'efecte d'explosió
     IEnumerator ExplodeCopies()
     {
         Debug.Log("Còpia explosiva activada! Canviant el seu color a vermell abans de l'explosió.");
-        
+
         // 1. Només canvia el color de l'última còpia (l'explosiva) a vermell
         GameObject explosiveCopy = plantedCopies[2];
         if (explosiveCopy != null)
@@ -240,12 +243,12 @@ public class PlayerManager : MonoBehaviour
                 sr.color = Color.red;
             }
         }
-        
+
         // 2. Espera 2 segons (el temps de l'"explosió")
         yield return new WaitForSeconds(2f);
-        
+
         Debug.Log("¡BOOM! Destruint totes les còpies.");
-        
+
         // 3. Destrueix totes les còpies
         foreach (GameObject copy in plantedCopies)
         {
@@ -254,9 +257,20 @@ public class PlayerManager : MonoBehaviour
                 Destroy(copy);
             }
         }
-        
+
         // 4. Neteja la llista i reinicia el comptador
         plantedCopies.Clear();
         currentCopies = 0;
+
+        // 5. Reinicia la posició del jugador al punt d'aparició assignat des de l'inspector
+        if (spawnPoint != null)
+        {
+            transform.position = spawnPoint.position;
+            Debug.Log("Jugador teletransportat al punt d'aparició.");
+        }
+        else
+        {
+            Debug.LogWarning("No s'ha assignat cap punt de spawn! El jugador no s'ha mogut.");
+        }
     }
 }
