@@ -2,47 +2,54 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Collections; // Important! Cal afegir l'espai de noms per a les coroutines
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class PlayerManager : MonoBehaviour
 {
-    // MOVIMENT
+    // --- VARIABLES CONFIGURABLES DESDE EL INSPECTOR ---
+
+    [Header("MOVIMENT")]
     public float moveSpeed = 5f;
     public float jumpForce = 5f;
 
-    // GROUNDCHECK
+    [Header("GROUNDCHECK")]
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
     public LayerMask groundLayerMask = 1;
 
-    // CÒPIES
+    [Header("CÒPIES")]
     public int maxCopies = 3;
-    private int currentCopies = 0;
-    private List<GameObject> plantedCopies = new List<GameObject>();
-
     // PREFABS DE CÒPIES (assignar des de l'inspector)
-    public GameObject platformCopyPrefab;   // Prefab per la còpia plataforma
-    public GameObject shooterCopyPrefab;    // Prefab per la còpia disparadora
-    public GameObject explosiveCopyPrefab;  // Prefab per la còpia explosiva
+    // S'assignen en ordre: 0=Plataforma, 1=Disparadora, 2=Explosiva
+    public GameObject[] copyPrefabs = new GameObject[3];
 
-    // CONFIGURACIÓ DISPARS
+    [Header("CONFIGURACIÓ DISPARS")]
     public GameObject projectilePrefab; // Assignar des de l'inspector
     public float projectileSpeed = 10f;
+
+    // --- VARIABLES PRIVADES ---
 
     // FÍSICA
     private Rigidbody2D rb;
     private bool isGrounded;
     private float horizontalInput;
 
-    void Start()
+    // CÒPIES
+    private int currentCopies = 0;
+    private readonly List<GameObject> plantedCopies = new List<GameObject>();
+
+    // --- MÈTODES DE UNITY ---
+
+    void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+    }
 
+    void Start()
+    {
         // COMPROVAR GROUNDCHECK
         if (groundCheck == null)
         {
-            GameObject groundCheckObj = new GameObject("GroundCheck");
-            groundCheckObj.transform.SetParent(transform);
-            groundCheckObj.transform.localPosition = new Vector3(0, -0.5f, 0);
-            groundCheck = groundCheckObj.transform;
+            CreateGroundCheck();
         }
     }
 
@@ -56,6 +63,8 @@ public class PlayerManager : MonoBehaviour
     {
         HandleMovement();
     }
+
+    // --- GESTIÓ D'INPUTS I MOVIMENT ---
 
     void HandleInput()
     {
@@ -75,19 +84,16 @@ public class PlayerManager : MonoBehaviour
         }
 
         // ACTIVAR CÒPIES
-        if (Input.GetKeyDown(KeyCode.Z) && plantedCopies.Count > 0)
+        if (Input.GetKeyDown(KeyCode.Z))
         {
-            // La primera còpia és la plataforma
             ActivatePlatformCopy();
         }
-        else if (Input.GetKeyDown(KeyCode.X) && plantedCopies.Count > 1)
+        else if (Input.GetKeyDown(KeyCode.X))
         {
-            // La segona còpia és la disparadora
             ActivateShooterCopy();
         }
-        else if (Input.GetKeyDown(KeyCode.T) && plantedCopies.Count > 2)
+        else if (Input.GetKeyDown(KeyCode.T))
         {
-            // La tercera còpia és l'explosiva
             ActivateExplosiveCopy();
         }
     }
@@ -95,27 +101,15 @@ public class PlayerManager : MonoBehaviour
     void HandleMovement()
     {
         // MOVIMENT HORITZONTAL
-        rb.linearVelocity = new Vector2(horizontalInput * moveSpeed, rb.linearVelocity.y);
+        rb.velocity = new Vector2(horizontalInput * moveSpeed, rb.velocity.y);
     }
 
     void Jump()
     {
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+        rb.velocity = new Vector2(rb.velocity.x, jumpForce);
     }
 
-    void CheckGrounded()
-    {
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayerMask);
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        if (groundCheck != null)
-        {
-            Gizmos.color = isGrounded ? Color.green : Color.red;
-            Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
-        }
-    }
+    // --- LÒGICA DE LES CÒPIES ---
 
     void CreateNextCopy()
     {
@@ -125,89 +119,69 @@ public class PlayerManager : MonoBehaviour
             return;
         }
 
-        GameObject prefabToUse = null;
-        string debugMessage = "";
-        GameObject newCopy = null;
+        GameObject prefabToUse = copyPrefabs[currentCopies];
 
-        switch (currentCopies)
-        {
-            case 0:
-                prefabToUse = platformCopyPrefab;
-                debugMessage = "Primera còpia creada (Plataforma)! Activa amb Z";
-                break;
-            case 1:
-                prefabToUse = shooterCopyPrefab;
-                debugMessage = "Segona còpia creada (Disparadora)! Activa amb X";
-                break;
-            case 2:
-                prefabToUse = explosiveCopyPrefab;
-                debugMessage = "Tercera còpia creada (Explosiva)! Activa amb T";
-                break;
-        }
-
-        // Si no s'ha assignat un prefab, utilitza l'objecte actual com a fallback
+        // Si no s'ha assignat un prefab, mostra un avís i no continuis.
         if (prefabToUse == null)
         {
-            prefabToUse = gameObject;
-            Debug.LogWarning("No s'ha assignat un prefab per la còpia. S'ha usat el propi jugador com a fallback.");
+            Debug.LogWarning($"No s'ha assignat el prefab per a la còpia {currentCopies}. Fes-ho a l'inspector.");
+            return;
         }
 
         // Crear i configurar la nova còpia
-        newCopy = Instantiate(prefabToUse, transform.position, transform.rotation);
+        GameObject newCopy = Instantiate(prefabToUse, transform.position, transform.rotation);
         
-        // Treure l'script del jugador si s'utilitza el propi objecte
-        if (prefabToUse == gameObject)
+        // Assegurem que la còpia sigui estàtica
+        if (newCopy.TryGetComponent<Rigidbody2D>(out Rigidbody2D copyRb))
         {
-            Destroy(newCopy.GetComponent<PlayerManager>());
+            copyRb.bodyType = RigidbodyType2D.Static;
         }
 
-        // Assignar els components i les configuracions específiques
-        Rigidbody2D copyRb = newCopy.GetComponent<Rigidbody2D>();
-        if (copyRb == null)
-        {
-            copyRb = newCopy.AddComponent<Rigidbody2D>();
-        }
-        copyRb.bodyType = RigidbodyType2D.Static;
-
-        // Afegir components específics i desactivar-los
-        switch (currentCopies)
-        {
-            case 1: // Shooter
-                ShooterCopy shooter = newCopy.GetComponent<ShooterCopy>();
-                if (shooter == null)
-                {
-                    shooter = newCopy.AddComponent<ShooterCopy>();
-                }
-                shooter.projectilePrefab = projectilePrefab;
-                shooter.projectileSpeed = projectileSpeed;
-                shooter.enabled = false;
-                break;
-            case 2: // Explosive
-                ExplosiveCopy explosive = newCopy.GetComponent<ExplosiveCopy>();
-                if (explosive == null)
-                {
-                    explosive = newCopy.AddComponent<ExplosiveCopy>();
-                }
-                explosive.enabled = false;
-                break;
-        }
+        // Configurar components específics de la còpia
+        ConfigureCopyComponents(newCopy, currentCopies);
 
         plantedCopies.Add(newCopy);
         currentCopies++;
-        Debug.Log(debugMessage);
+        Debug.Log($"Còpia {currentCopies} creada! Tipus: {prefabToUse.name}");
     }
-    
+
+    void ConfigureCopyComponents(GameObject copy, int copyIndex)
+    {
+        // Assignar components i les configuracions específiques
+        switch (copyIndex)
+        {
+            case 1: // Shooter
+                if (copy.TryGetComponent<ShooterCopy>(out var shooter))
+                {
+                    shooter.projectilePrefab = projectilePrefab;
+                    shooter.projectileSpeed = projectileSpeed;
+                    shooter.enabled = false; // El mantenim desactivat fins que s'activi amb la tecla X
+                }
+                break;
+            case 2: // Explosive
+                if (copy.TryGetComponent<ExplosiveCopy>(out var explosive))
+                {
+                    explosive.enabled = false; // El mantenim desactivat fins que s'activi amb la tecla T
+                }
+                break;
+        }
+    }
+
     void ActivatePlatformCopy()
     {
-        Debug.Log("Còpia plataforma activada! (Ja està activa per defecte)");
+        // La primera còpia és la plataforma
+        if (plantedCopies.Count > 0)
+        {
+            Debug.Log("Còpia plataforma activada! (Ja està activa per defecte)");
+        }
     }
-    
+
     void ActivateShooterCopy()
     {
-        if (plantedCopies.Count > 1)
+        // La segona còpia és la disparadora
+        if (plantedCopies.Count > 1 && plantedCopies[1] != null)
         {
-            GameObject shooterCopy = plantedCopies[1];
-            ShooterCopy shooter = shooterCopy.GetComponent<ShooterCopy>();
+            ShooterCopy shooter = plantedCopies[1].GetComponent<ShooterCopy>();
             if (shooter != null)
             {
                 shooter.enabled = true;
@@ -215,37 +189,34 @@ public class PlayerManager : MonoBehaviour
             }
         }
     }
-    
+
     void ActivateExplosiveCopy()
     {
+        // La tercera còpia és l'explosiva
         if (plantedCopies.Count > 2)
         {
             // Inicia la coroutine per a l'efecte d'explosió
             StartCoroutine(ExplodeCopies());
         }
     }
-    
+
     // Coroutine per gestionar l'efecte d'explosió
     IEnumerator ExplodeCopies()
     {
         Debug.Log("Còpia explosiva activada! Canviant el seu color a vermell abans de l'explosió.");
-        
+
         // 1. Només canvia el color de l'última còpia (l'explosiva) a vermell
         GameObject explosiveCopy = plantedCopies[2];
-        if (explosiveCopy != null)
+        if (explosiveCopy != null && explosiveCopy.TryGetComponent<SpriteRenderer>(out var sr))
         {
-            SpriteRenderer sr = explosiveCopy.GetComponent<SpriteRenderer>();
-            if (sr != null)
-            {
-                sr.color = Color.red;
-            }
+            sr.color = Color.red;
         }
-        
+
         // 2. Espera 2 segons (el temps de l'"explosió")
         yield return new WaitForSeconds(2f);
-        
+
         Debug.Log("¡BOOM! Destruint totes les còpies.");
-        
+
         // 3. Destrueix totes les còpies
         foreach (GameObject copy in plantedCopies)
         {
@@ -254,9 +225,35 @@ public class PlayerManager : MonoBehaviour
                 Destroy(copy);
             }
         }
-        
+
         // 4. Neteja la llista i reinicia el comptador
         plantedCopies.Clear();
         currentCopies = 0;
+    }
+
+
+    // --- HELPERS I GIZMOS ---
+
+    void CheckGrounded()
+    {
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayerMask);
+    }
+
+    void CreateGroundCheck()
+    {
+        GameObject groundCheckObj = new GameObject("GroundCheck");
+        groundCheckObj.transform.SetParent(transform);
+        groundCheckObj.transform.localPosition = new Vector3(0, -0.5f, 0);
+        groundCheck = groundCheckObj.transform;
+        Debug.Log("GroundCheck object creat automàticament.");
+    }
+    
+    void OnDrawGizmosSelected()
+    {
+        if (groundCheck != null)
+        {
+            Gizmos.color = isGrounded ? Color.green : Color.red;
+            Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+        }
     }
 }
