@@ -8,6 +8,10 @@ public class PlayerManager : MonoBehaviour
     public float moveSpeed = 5f;
     public float jumpForce = 5f;
 
+    // VIDA DEL JUGADOR
+    public int vidaMax = 3;
+    public int vidaActual;
+
     // GROUNDCHECK
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
@@ -38,6 +42,9 @@ public class PlayerManager : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        
+        // Inicialitzem la vida actual a la vida màxima al començament del joc
+        vidaActual = vidaMax;
 
         // COMPROVAR GROUNDCHECK
         if (groundCheck == null)
@@ -53,6 +60,12 @@ public class PlayerManager : MonoBehaviour
     {
         HandleInput();
         CheckGrounded();
+        
+        // NOU: Comprovació de la vida del jugador
+        if (vidaActual <= 0)
+        {
+            ResetPlayerPosition();
+        }
     }
 
     void FixedUpdate()
@@ -92,6 +105,13 @@ public class PlayerManager : MonoBehaviour
         {
             // La tercera còpia és l'explosiva
             ActivateExplosiveCopy();
+        }
+        
+        // Exemple per a provar la reducció de vida (pots esborrar-ho)
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            vidaActual--;
+            Debug.Log("Vida actual: " + vidaActual);
         }
     }
 
@@ -223,8 +243,23 @@ public class PlayerManager : MonoBehaviour
     {
         if (plantedCopies.Count > 2)
         {
-            // Inicia la coroutine per a l'efecte d'explosió
             StartCoroutine(ExplodeCopies());
+        }
+    }
+    
+    // Mètode per a gestionar el respawn
+    private void ResetPlayerPosition()
+    {
+        if (spawnPoint != null)
+        {
+            // Restableix la posició i la vida
+            transform.position = spawnPoint.position;
+            vidaActual = vidaMax;
+            Debug.Log("Jugador teletransportat al punt d'aparició i vida restablerta.");
+        }
+        else
+        {
+            Debug.LogWarning("No s'ha assignat cap punt de spawn! El jugador no s'ha mogut.");
         }
     }
 
@@ -233,7 +268,6 @@ public class PlayerManager : MonoBehaviour
     {
         Debug.Log("Còpia explosiva activada! Canviant el seu color a vermell abans de l'explosió.");
 
-        // 1. Només canvia el color de l'última còpia (l'explosiva) a vermell
         GameObject explosiveCopy = plantedCopies[2];
         if (explosiveCopy != null)
         {
@@ -244,12 +278,10 @@ public class PlayerManager : MonoBehaviour
             }
         }
 
-        // 2. Espera 2 segons (el temps de l'"explosió")
         yield return new WaitForSeconds(2f);
 
         Debug.Log("¡BOOM! Destruint totes les còpies.");
-
-        // 3. Destrueix totes les còpies
+        
         foreach (GameObject copy in plantedCopies)
         {
             if (copy != null)
@@ -257,20 +289,11 @@ public class PlayerManager : MonoBehaviour
                 Destroy(copy);
             }
         }
-
-        // 4. Neteja la llista i reinicia el comptador
+        
         plantedCopies.Clear();
         currentCopies = 0;
-
-        // 5. Reinicia la posició del jugador al punt d'aparició assignat des de l'inspector
-        if (spawnPoint != null)
-        {
-            transform.position = spawnPoint.position;
-            Debug.Log("Jugador teletransportat al punt d'aparició.");
-        }
-        else
-        {
-            Debug.LogWarning("No s'ha assignat cap punt de spawn! El jugador no s'ha mogut.");
-        }
+        
+        // També reinicia el jugador després de l'explosió
+        ResetPlayerPosition();
     }
 }
