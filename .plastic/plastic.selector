@@ -1,4 +1,0 @@
-repository "gmtk/gmtk@1773453@cloud"
-  path "/"
-    br "/main"
-    co "/main"
