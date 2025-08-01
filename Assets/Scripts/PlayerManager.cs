@@ -36,15 +36,17 @@ public class PlayerManager : MonoBehaviour
     private bool isGrounded;
     private float horizontalInput;
 
-    // Variable pública per al punt de spawn (assignar des de l'Inspector)
-    public Transform spawnPoint;
+    // Variable para el punto de spawn. Ahora es privada y se asigna con un método
+    private Transform spawnPoint;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        
-        // Inicialitzem la vida actual a la vida màxima al començament del joc
         vidaActual = vidaMax;
+
+        // Guarda la posición inicial del jugador como el primer punto de spawn
+        // Puedes cambiar esto para que el spawnPoint sea un GameObject inicial en la escena
+        spawnPoint = transform;
 
         // COMPROVAR GROUNDCHECK
         if (groundCheck == null)
@@ -61,7 +63,7 @@ public class PlayerManager : MonoBehaviour
         HandleInput();
         CheckGrounded();
         
-        // NOU: Comprovació de la vida del jugador
+        // Comprovació de la vida del jugador
         if (vidaActual <= 0)
         {
             ResetPlayerPosition();
@@ -247,7 +249,13 @@ public class PlayerManager : MonoBehaviour
         }
     }
     
-    // Mètode per a gestionar el respawn
+    // NOU MÈTODE: Estableix el punt de spawn actual
+    public void SetCurrentCheckpoint(Transform newCheckpoint)
+    {
+        spawnPoint = newCheckpoint;
+        Debug.Log("Checkpoint activat! Nou punt de respawn establert.");
+    }
+
     private void ResetPlayerPosition()
     {
         if (spawnPoint != null)
@@ -259,7 +267,10 @@ public class PlayerManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("No s'ha assignat cap punt de spawn! El jugador no s'ha mogut.");
+            // En cas que no hi hagi punt de spawn assignat, va a l'origen
+            transform.position = Vector3.zero;
+            vidaActual = vidaMax;
+            Debug.LogWarning("No s'ha assignat cap punt de spawn! El jugador es teletransporta a l'origen (0,0).");
         }
     }
 
@@ -293,7 +304,7 @@ public class PlayerManager : MonoBehaviour
         plantedCopies.Clear();
         currentCopies = 0;
         
-        // També reinicia el jugador després de l'explosió
+        // Reinicia el jugador després de l'explosió
         ResetPlayerPosition();
     }
 }
