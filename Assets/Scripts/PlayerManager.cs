@@ -39,6 +39,8 @@ public class PlayerManager : MonoBehaviour
     // Variable para el punto de spawn. Ahora es privada y se asigna con un método
     private Transform spawnPoint;
 
+    private Animator animator;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -56,6 +58,11 @@ public class PlayerManager : MonoBehaviour
             groundCheckObj.transform.localPosition = new Vector3(0, -0.5f, 0);
             groundCheck = groundCheckObj.transform;
         }
+
+        if (animator == null)
+        {
+            animator = GetComponent<Animator>();
+        }
     }
 
     void Update()
@@ -63,6 +70,8 @@ public class PlayerManager : MonoBehaviour
         HandleInput();
         CheckGrounded();
         
+        animator.SetBool("OnAir", !isGrounded);
+
         // Comprovació de la vida del jugador
         if (vidaActual <= 0)
         {
@@ -121,6 +130,16 @@ public class PlayerManager : MonoBehaviour
     {
         // MOVIMENT HORITZONTAL
         rb.linearVelocity = new Vector2(horizontalInput * moveSpeed, rb.linearVelocity.y);
+     
+        // GIRAR EL SPRITE SEGONS LA DIRECCIÓ
+        if (horizontalInput > 0)
+        {
+            transform.localScale = new Vector3(1, transform.localScale.y, transform.localScale.z); // Mirar a la dreta
+        }
+        else if (horizontalInput < 0)
+        {
+            transform.localScale = new Vector3(-1, transform.localScale.y, transform.localScale.z); // Mirar a l'esquerra
+        }
     }
 
     void Jump()
