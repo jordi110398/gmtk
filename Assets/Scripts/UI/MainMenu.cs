@@ -10,6 +10,8 @@ public class MainMenu : MonoBehaviour
     public GameObject panelOpciones;
     public GameObject panelControles;
     public GameObject botonesMenu;
+    public CameraZoom cameraZoom;
+
 
 
 
@@ -19,7 +21,7 @@ public class MainMenu : MonoBehaviour
         armarioCerrado.SetActive(false);
         puertaIzquierdaAbierta.SetActive(true);
 
-        Invoke("Load", 1f);
+        cameraZoom.EmpezarZoom();
     }
 
     public void Exit()
@@ -58,7 +60,7 @@ public class MainMenu : MonoBehaviour
         panelControles.SetActive(true);
     }
 
-    public void CerrarControles()
+    public void ClosedControlls()
     {
         panelControles.SetActive(false);
         puertaDerechaAbierta.SetActive(false);
