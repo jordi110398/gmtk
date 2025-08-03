@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 892743490403872785}
   - component: {fileID: 4683551517237771060}
   - component: {fileID: 2982252828304750235}
-  - component: {fileID: 8756542584784031097}
+  - component: {fileID: 7103905942042876706}
   m_Layer: 0
   m_Name: Player_Bomba
   m_TagString: Untagged
@@ -117,7 +117,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4922285614976940339}
-  m_BodyType: 0
+  m_BodyType: 2
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -136,14 +136,14 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!61 &8756542584784031097
-BoxCollider2D:
+--- !u!60 &7103905942042876706
+PolygonCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4922285614976940339}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
@@ -166,7 +166,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -180,8 +180,26 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
+  m_Points:
+    m_Paths:
+    - - {x: 1.0574532, y: 0.4268813}
+      - {x: 1.0574532, y: 1.3331313}
+      - {x: 0.99495316, y: 1.5831313}
+      - {x: 0.58870316, y: 1.9268813}
+      - {x: 0.33870316, y: 2.0206313}
+      - {x: -0.31754684, y: 2.0206313}
+      - {x: -0.63004684, y: 1.9268813}
+      - {x: -1.0675468, y: 1.6143813}
+      - {x: -1.0987968, y: 1.5206313}
+      - {x: -1.0987968, y: 0.5206313}
+      - {x: -0.78629684, y: 0.08313131}
+      - {x: -0.81754684, y: -0.4168687}
+      - {x: -0.44254684, y: -0.6356187}
+      - {x: 0.61995316, y: -0.6356187}
+      - {x: 0.68245316, y: -0.4481187}
+      - {x: 0.33870316, y: -0.3231187}
+      - {x: 0.99495316, y: 0.3018813}
+  m_UseDelaunayMesh: 0
 --- !u!1 &9084679723605786651
 GameObject:
   m_ObjectHideFlags: 0
@@ -207,7 +225,7 @@ Transform:
   m_GameObject: {fileID: 9084679723605786651}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.51, z: 0}
+  m_LocalPosition: {x: 0, y: -0.55, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
