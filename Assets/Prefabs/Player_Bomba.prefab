@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 892743490403872785}
   - component: {fileID: 4683551517237771060}
   - component: {fileID: 2982252828304750235}
-  - component: {fileID: 8756542584784031097}
+  - component: {fileID: 7103905942042876706}
   m_Layer: 0
   m_Name: Player_Bomba
   m_TagString: Untagged
@@ -32,8 +32,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 6039165161753428849}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &892743490403872785
@@ -79,7 +78,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -1
   m_Sprite: {fileID: 7522549269996768275, guid: f947773a9f84c3e4b8d518f928786607, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -103,7 +102,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 679c6822d0614e245bbd2c07e59621c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  explosionRadius: 3
+  explosionRadius: 2.87
   explosionForce: 500
   triggerDistance: 1.5
   targetLayerMask:
@@ -117,7 +116,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4922285614976940339}
-  m_BodyType: 0
+  m_BodyType: 2
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -136,14 +135,14 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!61 &8756542584784031097
-BoxCollider2D:
+--- !u!60 &7103905942042876706
+PolygonCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4922285614976940339}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
@@ -166,50 +165,37 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.50958693, y: 0.23929174}
+    pivot: {x: 0.5, y: 0}
     oldSize: {x: 2.15625, y: 2.65625}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
---- !u!1 &9084679723605786651
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 6039165161753428849}
-  m_Layer: 0
-  m_Name: GroundCheck
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &6039165161753428849
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9084679723605786651}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.51, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 740674415236753982}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Points:
+    m_Paths:
+    - - {x: 1.078125, y: 1.0625}
+      - {x: 1.078125, y: 1.96875}
+      - {x: 1.015625, y: 2.21875}
+      - {x: 0.609375, y: 2.5625}
+      - {x: 0.359375, y: 2.65625}
+      - {x: -0.296875, y: 2.65625}
+      - {x: -0.609375, y: 2.5625}
+      - {x: -1.046875, y: 2.25}
+      - {x: -1.078125, y: 2.15625}
+      - {x: -1.078125, y: 1.15625}
+      - {x: -0.765625, y: 0.71875}
+      - {x: -0.796875, y: 0.21875}
+      - {x: -0.421875, y: 0}
+      - {x: 0.640625, y: 0}
+      - {x: 0.703125, y: 0.1875}
+      - {x: 0.359375, y: 0.3125}
+      - {x: 1.015625, y: 0.9375}
+  m_UseDelaunayMesh: 0

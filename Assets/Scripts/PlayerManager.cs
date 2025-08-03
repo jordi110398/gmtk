@@ -9,7 +9,7 @@ public class PlayerManager : MonoBehaviour
     public float jumpForce = 5f;
 
     // VIDA DEL JUGADOR
-    public int vidaMax = 3;
+    public int vidaMax = 6;
     public int vidaActual;
 
     // GROUNDCHECK
@@ -41,10 +41,25 @@ public class PlayerManager : MonoBehaviour
 
     private Animator animator;
 
+    // AUDIO
+    public AudioSource audioSource;
+
+    // FEEDBACK VISUAL
+    private SpriteRenderer spriteRenderer;
+    private Color originalColor;
+    private Vector3 originalScale;
+    public float flashDuration = 0.1f; // Durada del flaix de dany
+    private bool isFacingRight = true; // Per controlar la direcció del jugador
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         vidaActual = vidaMax;
+        audioSource = GetComponent<AudioSource>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        originalColor = spriteRenderer.color;
+        originalScale = transform.localScale;
+        // Guarda la escala original del jugador
 
         // Guarda la posición inicial del jugador como el primer punto de spawn
         // Puedes cambiar esto para que el spawnPoint sea un GameObject inicial en la escena
@@ -69,7 +84,7 @@ public class PlayerManager : MonoBehaviour
     {
         HandleInput();
         CheckGrounded();
-        
+
         animator.SetBool("OnAir", !isGrounded);
 
         // Comprovació de la vida del jugador
@@ -117,7 +132,7 @@ public class PlayerManager : MonoBehaviour
             // La tercera còpia és l'explosiva
             ActivateExplosiveCopy();
         }
-        
+
         // Exemple per a provar la reducció de vida (pots esborrar-ho)
         if (Input.GetKeyDown(KeyCode.V))
         {
@@ -130,14 +145,16 @@ public class PlayerManager : MonoBehaviour
     {
         // MOVIMENT HORITZONTAL
         rb.linearVelocity = new Vector2(horizontalInput * moveSpeed, rb.linearVelocity.y);
-     
+
         // GIRAR EL SPRITE SEGONS LA DIRECCIÓ
         if (horizontalInput > 0)
         {
+            isFacingRight = true;
             transform.localScale = new Vector3(1, transform.localScale.y, transform.localScale.z); // Mirar a la dreta
         }
         else if (horizontalInput < 0)
         {
+            isFacingRight = false;
             transform.localScale = new Vector3(-1, transform.localScale.y, transform.localScale.z); // Mirar a l'esquerra
         }
     }
@@ -172,20 +189,26 @@ public class PlayerManager : MonoBehaviour
         GameObject prefabToUse = null;
         string debugMessage = "";
         GameObject newCopy = null;
+        Vector3 spawnOffset = Vector3.zero;
+        Quaternion copyRotation = Quaternion.identity; // Per defecte, sense rotació
 
         switch (currentCopies)
         {
             case 0:
                 prefabToUse = platformCopyPrefab;
                 debugMessage = "Primera còpia creada (Plataforma)! Activa amb Z";
+                spawnOffset = new Vector3(isFacingRight ? 1.2f : -1.2f, 0f, 0f); // Davant del jugador
                 break;
             case 1:
                 prefabToUse = shooterCopyPrefab;
                 debugMessage = "Segona còpia creada (Disparadora)! Activa amb X";
+                spawnOffset = new Vector3(isFacingRight ? 1.5f : -1.5f, 0f, 0f); // Més endavant
+                // NO modificar copyRotation!
                 break;
             case 2:
                 prefabToUse = explosiveCopyPrefab;
                 debugMessage = "Tercera còpia creada (Explosiva)! Activa amb T";
+                spawnOffset = new Vector3(isFacingRight ? 1.2f : -1.2f, -0.15f, 0f); // Davant i una mica abaix
                 break;
         }
 
@@ -197,8 +220,8 @@ public class PlayerManager : MonoBehaviour
         }
 
         // Crear i configurar la nova còpia
-        newCopy = Instantiate(prefabToUse, transform.position, transform.rotation);
-        
+        newCopy = Instantiate(prefabToUse, transform.position + spawnOffset, copyRotation);
+
         // Treure l'script del jugador si s'utilitza el propi objecte
         if (prefabToUse == gameObject)
         {
@@ -225,6 +248,20 @@ public class PlayerManager : MonoBehaviour
                 shooter.projectilePrefab = projectilePrefab;
                 shooter.projectileSpeed = projectileSpeed;
                 shooter.enabled = false;
+                // Mirar cap a la direcció del jugador
+                SpriteRenderer shooterSprite = newCopy.GetComponent<SpriteRenderer>();
+                if (shooterSprite != null)
+                {
+                    shooterSprite.flipX = isFacingRight;
+                }
+                // Si el prefab té un punt de disparo, girar-lo
+                if (shooter.shootPoint != null)
+                {
+                    Vector3 originalLocalPos = shooter.shootPoint.localPosition;
+                    shooter.shootPoint.localPosition = new Vector3(isFacingRight ? Mathf.Abs(originalLocalPos.x) : -Mathf.Abs(originalLocalPos.x), originalLocalPos.y, originalLocalPos.z);
+                }
+                // Guardar la direcció de dispar
+                shooter.shootDirection = isFacingRight ? Vector2.right : Vector2.left;
                 break;
             case 2: // Explosive
                 ExplosiveCopy explosive = newCopy.GetComponent<ExplosiveCopy>();
@@ -240,12 +277,12 @@ public class PlayerManager : MonoBehaviour
         currentCopies++;
         Debug.Log(debugMessage);
     }
-    
+
     void ActivatePlatformCopy()
     {
         Debug.Log("Còpia plataforma activada! (Ja està activa per defecte)");
     }
-    
+
     void ActivateShooterCopy()
     {
         if (plantedCopies.Count > 1)
@@ -259,7 +296,7 @@ public class PlayerManager : MonoBehaviour
             }
         }
     }
-    
+
     void ActivateExplosiveCopy()
     {
         if (plantedCopies.Count > 2)
@@ -267,7 +304,7 @@ public class PlayerManager : MonoBehaviour
             StartCoroutine(ExplodeCopies());
         }
     }
-    
+
     // NOU MÈTODE: Estableix el punt de spawn actual
     public void SetCurrentCheckpoint(Transform newCheckpoint)
     {
@@ -311,7 +348,7 @@ public class PlayerManager : MonoBehaviour
         yield return new WaitForSeconds(2f);
 
         Debug.Log("¡BOOM! Destruint totes les còpies.");
-        
+
         foreach (GameObject copy in plantedCopies)
         {
             if (copy != null)
@@ -319,11 +356,33 @@ public class PlayerManager : MonoBehaviour
                 Destroy(copy);
             }
         }
-        
+
         plantedCopies.Clear();
         currentCopies = 0;
-        
+
         // Reinicia el jugador després de l'explosió
         ResetPlayerPosition();
+    }
+
+    // FEEDBACK VISUAL
+    public IEnumerator PlayDamageFlash()
+    {
+        Debug.Log("Flaix de mal activat!"); // Comprovació de si entra a la funció
+        spriteRenderer.color = Color.red; // Color vermell
+        yield return new WaitForSeconds(flashDuration);
+        spriteRenderer.color = originalColor;
+    }
+    public IEnumerator PlayDamagePulse()
+    {
+        float pulseScale = 1.2f;
+        float pulseDuration = 0.1f;
+        float xSign = isFacingRight ? 1f : -1f;
+
+        // Escala cap amunt mantenint la direcció
+        transform.localScale = new Vector3(originalScale.x * pulseScale * xSign, originalScale.y * pulseScale, originalScale.z);
+        yield return new WaitForSeconds(pulseDuration);
+
+        // Torna a la mida original i direcció correcta
+        transform.localScale = new Vector3(originalScale.x * xSign, originalScale.y, originalScale.z);
     }
 }
