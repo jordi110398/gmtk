@@ -29,7 +29,7 @@ public class Boss : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            gameManager.GetComponent<HealthSystem>().TakeDamage("Player", 1f);
+            gameManager.GetComponent<HealthSystem>().TakeDamage(1f);
         }
         else if (other.CompareTag("Projectile"))
         {

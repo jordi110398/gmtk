@@ -2,9 +2,10 @@ using UnityEngine;
 
 public class Enemic : MonoBehaviour
 {
+    [SerializeField] private GameObject gameManager;
     public Transform puntoA;
     public Transform puntoB;
-    public float vidaEnemic = 5f; // Vida del enemigo
+    public float vidaEnemic = 1f; // Vida del enemigo
     public float velocidad = 2f;
     public Collider2D coliderCuerpo;
     public Collider2D coliderCabeza;
@@ -51,7 +52,7 @@ public class Enemic : MonoBehaviour
         // Si el jugador entra en el cuerpo, puedes gestionar daño aquí si quieres
         else if (other.gameObject.CompareTag("Player"))
         {
-            playerManager.GetComponent<HealthSystem>().TakeDamage(0.5f);
+            gameManager.GetComponent<HealthSystem>().TakeDamage(0.5f);
         }
         else if (other.gameObject.CompareTag("Projectile"))
         {
