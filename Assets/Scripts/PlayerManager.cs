@@ -50,6 +50,7 @@ public class PlayerManager : MonoBehaviour
     private Vector3 originalScale;
     public float flashDuration = 0.1f; // Durada del flaix de dany
     private bool isFacingRight = true; // Per controlar la direcció del jugador
+    private float damageCoolDown = 1f;
 
     void Start()
     {
@@ -86,6 +87,8 @@ public class PlayerManager : MonoBehaviour
         CheckGrounded();
 
         animator.SetBool("OnAir", !isGrounded);
+        damageCoolDown -= Time.deltaTime;
+        damageCoolDown = Mathf.Max(0f, damageCoolDown);
 
         // Comprovació de la vida del jugador
         if (vidaActual <= 0)
@@ -364,6 +367,25 @@ public class PlayerManager : MonoBehaviour
         ResetPlayerPosition();
     }
 
+    public void TakeDamage(float amount){
+        if (damageCoolDown <= 0f){
+            vidaActual -= (int)amount;
+            vidaActual = Mathf.Max(vidaActual, 0);
+            StartCoroutine(PlayDamageFlash());
+            StartCoroutine(PlayDamagePulse());
+
+            if (vidaActual <= 0)
+            {
+                ResetPlayerPosition();
+            }
+            else
+            {
+                Debug.Log($"Jugador ha rebut {amount} de mal. Vida restant: {vidaActual}");
+            }
+            damageCoolDown = 1f;
+        }
+    }
+
     // FEEDBACK VISUAL
     public IEnumerator PlayDamageFlash()
     {
@@ -372,6 +394,7 @@ public class PlayerManager : MonoBehaviour
         yield return new WaitForSeconds(flashDuration);
         spriteRenderer.color = originalColor;
     }
+
     public IEnumerator PlayDamagePulse()
     {
         float pulseScale = 1.2f;
