@@ -315,7 +315,7 @@ public class PlayerManager : MonoBehaviour
         Debug.Log("Checkpoint activat! Nou punt de respawn establert.");
     }
 
-    private void ResetPlayerPosition()
+    public void ResetPlayerPosition()
     {
         if (spawnPoint != null)
         {
