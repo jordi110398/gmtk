@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 22e83efa077502d438f744ff925a174d
+guid: 5457dc2e8de9da84eb8ecdb54f5a24ce
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7781847596978592924
-    second: sin tentaculos_0
+      213: 2287376252180466942
+    second: perxero_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -109,30 +109,17 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: Android
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: sin tentaculos_0
+      name: perxero_0
       rect:
         serializedVersion: 2
-        x: 11
-        y: 15
-        width: 40
-        height: 37
+        x: 6
+        y: 49
+        width: 120
+        height: 45
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 4632ddd27d2510490800000000000000
-      internalID: -7781847596978592924
+      spriteID: efc81e215946ebf10800000000000000
+      internalID: 2287376252180466942
       vertices: []
       indices: 
       edges: []
@@ -161,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      sin tentaculos_0: -7781847596978592924
+      perxero_0: 2287376252180466942
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
