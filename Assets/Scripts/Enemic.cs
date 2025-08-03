@@ -4,12 +4,15 @@ public class Enemic : MonoBehaviour
 {
     public Transform puntoA;
     public Transform puntoB;
+    public float vidaEnemic = 5f; // Vida del enemigo
     public float velocidad = 2f;
     public Collider2D coliderCuerpo;
     public Collider2D coliderCabeza;
 
     private Vector3 destinoActual;
     private SpriteRenderer spriteRenderer;
+
+    public GameObject playerManager;
 
     void Start()
     {
@@ -37,12 +40,18 @@ public class Enemic : MonoBehaviour
         // Si el jugador entra en la cabeza, el enemigo muere
         if (other.gameObject.CompareTag("Player") && other.bounds.Intersects(coliderCabeza.bounds))
         {
-            Destroy(gameObject);
+            Debug.Log("Cap trepitjat!");
+            vidaEnemic -= 1f; // Reducir vida del enemigo
+            if (vidaEnemic <= 0)
+            {
+                Debug.Log("Enemic mort!");
+                Destroy(gameObject);
+            }
         }
         // Si el jugador entra en el cuerpo, puedes gestionar daño aquí si quieres
         else if (other.gameObject.CompareTag("Player"))
         {
-            other.GetComponent<PlayerManager>().TakeDamage(1f);
+            playerManager.GetComponent<HealthSystem>().TakeDamage(0.5f);
         }
         else if (other.gameObject.CompareTag("Projectile"))
         {

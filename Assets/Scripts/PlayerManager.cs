@@ -237,7 +237,7 @@ public class PlayerManager : MonoBehaviour
         {
             copyRb = newCopy.AddComponent<Rigidbody2D>();
         }
-        copyRb.bodyType = RigidbodyType2D.Static;
+        copyRb.bodyType = RigidbodyType2D.Kinematic;
 
         // Afegir components específics i desactivar-los
         switch (currentCopies)
@@ -315,7 +315,7 @@ public class PlayerManager : MonoBehaviour
         Debug.Log("Checkpoint activat! Nou punt de respawn establert.");
     }
 
-    private void ResetPlayerPosition()
+    public void ResetPlayerPosition()
     {
         if (spawnPoint != null)
         {

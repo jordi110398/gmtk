@@ -12,7 +12,7 @@ public class HealthSystem : MonoBehaviour
 
     // Jugador
     public GameObject player;
- 
+
     // Camera
     private Camera mainCamera;
 
@@ -31,31 +31,35 @@ public class HealthSystem : MonoBehaviour
     }
 
     // Funció per infligir mal a un jugador
-    public void TakeDamage(string playerTag, float amount)
+    public void TakeDamage(float amount)
     {
         // Obtenir els jugadors
         player = GameObject.FindGameObjectWithTag("Player");
 
+        var playerController = player.GetComponent<PlayerManager>();
+        playerHealth -= amount;
+        playerHealth = Mathf.Max(playerHealth, 0); // Evitar valors negatius
+        playerHearts.TakeDamage(amount); // Actualitzar la barra de vida
 
-        if (playerTag == "Player")
+        // So de dany Player
+        playerController.audioSource.PlayOneShot(AudioManager.Instance.playerHurt);
+        // Camera shake
+        if (mainCamera != null)
         {
-            var playerController = player.GetComponent<PlayerManager>();
-            playerHealth -= amount;
-            playerHealth = Mathf.Max(playerHealth, 0); // Evitar valors negatius
-            playerHearts.TakeDamage(amount); // Actualitzar la barra de vida
-
-            // So de dany Player
-            playerController.audioSource.PlayOneShot(AudioManager.Instance.playerHurt);
-            // Camera shake
-            if (mainCamera != null)
-            {
-                mainCamera.GetComponent<AdaptiveCamera>().ShakeCamera(0.15f, 0.3f); // Iniciar el shake de la càmera
-            }
-            // --- Flash de dany ---
-            playerController.StartCoroutine(playerController.PlayDamageFlash());
-            playerController.StartCoroutine(playerController.PlayDamagePulse());
-
-            Debug.Log($"Player ha rebut {amount} de mal. Vida restant: {playerHealth}");
+            mainCamera.GetComponent<AdaptiveCamera>().ShakeCamera(0.15f, 0.3f); // Iniciar el shake de la càmera
         }
+        // --- Flash de dany ---
+        playerController.StartCoroutine(playerController.PlayDamageFlash());
+        playerController.StartCoroutine(playerController.PlayDamagePulse());
+
+        Debug.Log($"Player ha rebut {amount} de mal. Vida restant: {playerHealth}");
+
+        // Comprovar si la vida arriba a 0
+        if (playerHealth <= 0)
+        {
+            Debug.Log("Player ha mort!");
+            player.GetComponent<PlayerManager>().ResetPlayerPosition();
+        }
+
     }
 }

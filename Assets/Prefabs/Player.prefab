@@ -171,7 +171,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
-  jumpForce: 5
+  jumpForce: 6
   vidaMax: 3
   vidaActual: 4
   groundCheck: {fileID: 5148492936369846565}
@@ -185,6 +185,8 @@ MonoBehaviour:
   explosiveCopyPrefab: {fileID: 4922285614976940339, guid: 23d56c37608c63249a5448018bb2de10, type: 3}
   projectilePrefab: {fileID: 6764343776259609361, guid: 85eebc4665854f84ea5c508dc3b7f1da, type: 3}
   projectileSpeed: 10
+  audioSource: {fileID: 0}
+  flashDuration: 0.1
 --- !u!95 &4086204670236776407
 Animator:
   serializedVersion: 7
